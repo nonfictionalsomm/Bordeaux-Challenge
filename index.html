@@ -32,7 +32,7 @@
         }
         .timeline-item {
             cursor: pointer;
-            transition: background-color: 0.2s;
+            transition: background-color 0.2s;
         }
         .timeline-item:hover {
             background-color: #4B5563; /* bg-gray-600 */
@@ -954,7 +954,7 @@
                 button.disabled = true;
                 button.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>';
 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
                 try {
                     const response = await fetch(apiUrl, {
