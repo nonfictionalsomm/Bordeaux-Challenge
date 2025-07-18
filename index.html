@@ -968,22 +968,31 @@
                     });
 
                     if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("API Error Response:", errorData);
                         throw new Error(`API request failed with status ${response.status}`);
                     }
 
                     const data = await response.json();
-                    const aiResponse = data.candidates[0].content.parts[0].text;
                     
-                    const aiContent = document.getElementById('ai-content');
-                    if (aiContent) {
-                        aiContent.innerHTML = aiResponse;
-                        aiContent.classList.remove('hidden');
+                    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
+                        const aiResponse = data.candidates[0].content.parts[0].text;
+                        const aiContent = document.getElementById('ai-content');
+                        if (aiContent) {
+                            aiContent.innerHTML = aiResponse;
+                            aiContent.classList.remove('hidden');
+                        }
+                    } else {
+                        throw new Error("Invalid response structure from API.");
                     }
 
                 } catch (error) {
                     console.error("Gemini API error:", error);
                     const aiContent = document.getElementById('ai-content');
-                    if(aiContent) aiContent.innerHTML = `<p class="text-red-400">Error generating content. Please check your API key and network connection.</p>`;
+                    if(aiContent) {
+                        aiContent.innerHTML = `<p class="text-red-400">Error generating content. Please check your API key, network connection, and the browser console for details.</p>`;
+                        aiContent.classList.remove('hidden');
+                    }
                 } finally {
                     button.disabled = false;
                     button.innerHTML = button.dataset.originalText;
@@ -1024,6 +1033,7 @@
                 });
 
                 submitBtn.addEventListener('click', () => {
+                    submitBtn.disabled = true;
                     const userOrder = Array.from(timelineList.children).map(el => parseInt(el.dataset.year));
                     const correctOrder = questionData.events.map(e => e.year);
                     let isCorrect = true;
@@ -1039,7 +1049,7 @@
                     
                     if (isCorrect) score++;
 
-                    gameScreen.innerHTML += `
+                    const resultsHtml = `
                         <div class="mt-8 text-left">
                             <h3 class="text-xl font-bold mb-2 text-purple-400">Correct Timeline:</h3>
                             <div class="space-y-2">
@@ -1050,6 +1060,9 @@
                         </div>
                         <button id="next-question" class="mt-8 bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-lg transition-colors">Next</button>
                     `;
+                    
+                    // Use insertAdjacentHTML to avoid re-parsing the whole container
+                    submitBtn.parentElement.insertAdjacentHTML('beforeend', resultsHtml);
                     
                     document.getElementById('next-question').addEventListener('click', () => {
                         currentQuestionIndex++;
