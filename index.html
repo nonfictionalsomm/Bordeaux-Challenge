@@ -1005,7 +1005,7 @@
                 const shuffledEvents = shuffleArray([...questionData.events]);
 
                 gameScreen.innerHTML = `
-                    <div class="text-center">
+                    <div id="historian-container" class="text-center">
                         <h2 class="text-3xl font-bold mb-4">${questionData.title}</h2>
                         <p class="mb-2 text-gray-400">Unordered Events:</p>
                         <div id="source-list" class="mb-6 space-y-2">
@@ -1034,11 +1034,10 @@
 
                 submitBtn.addEventListener('click', () => {
                     submitBtn.disabled = true;
-                    const userOrder = Array.from(timelineList.children).map(el => parseInt(el.dataset.year));
                     const correctOrder = questionData.events.map(e => e.year);
                     let isCorrect = true;
 
-                    timelineList.children.forEach((item, index) => {
+                    Array.from(timelineList.children).forEach((item, index) => {
                         if (parseInt(item.dataset.year) === correctOrder[index]) {
                             item.classList.add('correct');
                         } else {
@@ -1049,7 +1048,8 @@
                     
                     if (isCorrect) score++;
 
-                    const resultsHtml = `
+                    const resultsContainer = document.createElement('div');
+                    resultsContainer.innerHTML = `
                         <div class="mt-8 text-left">
                             <h3 class="text-xl font-bold mb-2 text-purple-400">Correct Timeline:</h3>
                             <div class="space-y-2">
@@ -1061,8 +1061,7 @@
                         <button id="next-question" class="mt-8 bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded-lg transition-colors">Next</button>
                     `;
                     
-                    // Use insertAdjacentHTML to avoid re-parsing the whole container
-                    submitBtn.parentElement.insertAdjacentHTML('beforeend', resultsHtml);
+                    document.getElementById('historian-container').appendChild(resultsContainer);
                     
                     document.getElementById('next-question').addEventListener('click', () => {
                         currentQuestionIndex++;
